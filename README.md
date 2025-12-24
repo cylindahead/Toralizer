@@ -153,7 +153,7 @@ This project serves as an excellent learning resource for:
 - Check that the proxy supports SOCKS4 protocol
 - Ensure firewall rules allow connections to the proxy
 
-##Library Loading Issues
+## Library Loading Issues
 - Use ldd ./toralize.so to check for missing dependencies
 - Ensure you have permission to preload libraries
 - Some applications may have restrictions on LD_PRELOAD
