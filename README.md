@@ -1,21 +1,17 @@
-Toralize
+# Toralize
 A lightweight LD_PRELOAD library that intercepts connect() calls and transparently routes TCP connections through a SOCKS4 proxy.
 
-📺 Source
+## Source
 This project was originally presented by Dr. Jonas Birch on his YouTube channel. The code demonstrates advanced concepts in:
+- Linux system programming
+- LD_PRELOAD hooking techniques
+- SOCKS protocol implementation
+- Network interception and redirection
 
-Linux system programming
-
-LD_PRELOAD hooking techniques
-
-SOCKS protocol implementation
-
-Network interception and redirection
-
-Overview
+## Overview
 Toralize is a shared library that, when preloaded, intercepts the standard connect() system call and redirects connections through a SOCKS4 proxy without requiring any code modifications to the target application. This is particularly useful for forcing applications that don't natively support proxies to route their traffic through Tor or other SOCKS4-compatible proxies.
 
-Features
+## Features
 Transparent Proxy Routing: Automatically redirects TCP connections through a SOCKS4 proxy
 
 No Application Modifications: Works via LD_PRELOAD without changing application code
@@ -35,22 +31,25 @@ toralize/
 Building
 To build the shared library:
 
-bash
+```bash
 make
 This will generate toralize.so in the current directory.
+```
 
 To clean up:
 
-bash
+```bash
 make clean
 Usage
 Basic Usage
 Preload the library when launching your application:
+```
 
-bash
+```bash
 LD_PRELOAD=./toralize.so your_application
 Configuration
 The proxy settings are configured in toralize.h:
+```
 
 c
 #define PROXY       "127.0.0.1"    // Proxy server address
@@ -61,27 +60,31 @@ Modify these values to match your proxy server configuration.
 Example with Tor
 To route an application's traffic through Tor (assuming Tor is running with default settings):
 
-bash
+```bash
 LD_PRELOAD=./toralize.so curl https://example.com
 Example with Custom Proxy
 For a custom SOCKS4 proxy at 192.168.1.100:1080:
+```
 
 Edit toralize.h:
 
-c
+```c
 #define PROXY       "192.168.1.100"
 #define PROXYPORT   1080
 Rebuild:
+```
 
-bash
+```bash
 make clean && make
 Run your application:
+```
 
-bash
+```bash
 LD_PRELOAD=./toralize.so your_app
 How It Works
 Interception Mechanism
 The library uses dlsym(RTLD_NEXT, "connect") to obtain a pointer to the original connect() function, then provides its own implementation that:
+```
 
 Establishes a connection to the SOCKS4 proxy
 
@@ -120,27 +123,20 @@ libdl for dynamic linking
 
 POSIX-compliant system (Linux, BSD, etc.)
 
-Limitations
-SOCKS4 Only: Does not support SOCKS4a or SOCKS5 protocols
+## Limitations
+- SOCKS4 Only: Does not support SOCKS4a or SOCKS5 protocols
+- TCP Only: Only intercepts TCP connections (via connect())
+- IPv4 Only: Only supports IPv4 addresses
+- Single Proxy: All connections go through the same configured proxy
+- No Authentication: Only supports SOCKS4 without authentication
 
-TCP Only: Only intercepts TCP connections (via connect())
+## Security Considerations
+- Transparent Traffic Routing: Be aware that all TCP connections from the application will be routed through the proxy
+- DNS Leaks: SOCKS4 requires IP addresses, so DNS resolution occurs locally (not through the proxy)
+- Error Handling: The library provides basic error handling but may not cover all edge cases
+- Thread Safety: Use with caution in multi-threaded applications
 
-IPv4 Only: Only supports IPv4 addresses
-
-Single Proxy: All connections go through the same configured proxy
-
-No Authentication: Only supports SOCKS4 without authentication
-
-Security Considerations
-Transparent Traffic Routing: Be aware that all TCP connections from the application will be routed through the proxy
-
-DNS Leaks: SOCKS4 requires IP addresses, so DNS resolution occurs locally (not through the proxy)
-
-Error Handling: The library provides basic error handling but may not cover all edge cases
-
-Thread Safety: Use with caution in multi-threaded applications
-
-Troubleshooting
+## Troubleshooting
 Connection Failures
 Verify the proxy server is running and accessible
 
